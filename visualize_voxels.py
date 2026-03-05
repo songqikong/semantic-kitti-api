@@ -58,7 +58,7 @@ def unpack(compressed):
 
 
 class Window:
-    def __init__(self):
+    def __init__(self, voxel_dims=(256, 256, 32)):
         if not glfw.init():
             raise RuntimeError("Unable to initialize glfw.")
 
@@ -96,7 +96,7 @@ class Window:
         glfw.set_char_callback(self.window, self.char_callback)
         glfw.set_scroll_callback(self.window, self.scroll_callback)
 
-        self.voxel_dims = glow.ivec3(256, 256, 32)
+        self.voxel_dims = glow.ivec3(*voxel_dims)
 
         # read config file.
         CFG = yaml.safe_load(open("config/semantic-kitti.yaml", "r"))
@@ -696,11 +696,21 @@ if __name__ == "__main__":
         help="Sequence to visualize. Defaults to %(default)s",
     )
 
+    parser.add_argument(
+        "--voxel_dims",
+        "-v",
+        type=int,
+        nargs=3,
+        default=[256, 256, 32],
+        metavar=("W", "H", "D"),
+        help="Voxel grid dimensions as W H D. Defaults to %(default)s",
+    )
+
     FLAGS, unparsed = parser.parse_known_args()
 
     sequence_directory = os.path.join(FLAGS.dataset, "sequences", FLAGS.sequence)
 
-    window = Window()
+    window = Window(voxel_dims=FLAGS.voxel_dims)
     window.open_directory(sequence_directory)
 
     window.run()
